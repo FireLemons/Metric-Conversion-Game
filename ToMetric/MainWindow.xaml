@@ -1,0 +1,370 @@
+﻿<Window x:Class="ToMetric.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ToMetric"
+        mc:Ignorable="d"
+        Style="{StaticResource MainWindow}" Closing="SaveOptions">
+    <DockPanel Name="App">
+        <!--Nav bar-->
+        <DockPanel DockPanel.Dock="Top">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Click="OpenOptions" DockPanel.Dock="Right" Style="{StaticResource DarkButton}" Visibility="{Binding IsGame, Converter={StaticResource IsGameToElementVisibility}, ConverterParameter=Game, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal" Margin="8">
+                        <Image Source="img/settings.png" Style="{StaticResource IconLarge}"/>
+                        <TextBlock Text="Options"/>
+                    </StackPanel>
+                </Button>
+                <Button Click="CloseOptions" DockPanel.Dock="Right" Style="{StaticResource DarkButton}" Visibility="{Binding IsGame, Converter={StaticResource IsGameToElementVisibility}, ConverterParameter=Options, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                    <StackPanel Orientation="Horizontal" Margin="8">
+                        <Image Source="img/back.png" Style="{StaticResource IconLarge}"/>
+                        <TextBlock Text="Back"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </DockPanel>
+        <Grid>
+            <Grid Visibility="{Binding IsGame, Converter={StaticResource IsGameToElementVisibility}, ConverterParameter=Game, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Column="1" Grid.Row="1" Name="Game">
+                    <Grid DockPanel.Dock="Bottom">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Style="{StaticResource DisplayConvertFromBorder}">
+                            <TextBlock Style="{StaticResource DisplayConvertFrom}" Text="{Binding ConvertFrom, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+                        <Border Grid.Column="1" Style="{StaticResource DisplayConvertFromUnitBorder}">
+                            <TextBlock Style="{StaticResource DisplayConvertFromUnit}" Text="{Binding FromAbbreviation, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+                        <TextBlock Grid.Column="2" Style="{StaticResource DisplayConvertFromUnit}" Text=" = "/>
+                            <ContentControl Grid.Column="3" Name="UserInput" Template="{DynamicResource PlaceHolderInput}" local:PlaceholderAttachedProperties.Placeholder="Enter answer here" KeyDown="Evaluate"/>
+                        <Border Grid.Column="4" Style="{StaticResource DisplayConvertFromUnitBorder}">
+                            <TextBlock Style="{StaticResource DisplayConvertFromUnit}" Text="{Binding ToAbbreviation, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+                        </Grid>
+                    <Grid Style="{StaticResource Display}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="8*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Style="{StaticResource DisplayBorderLeft}">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top" Style="{StaticResource DisplayLabel}" Text="Score"/>
+                                <TextBlock Style="{StaticResource DisplayValue}" Text="{Binding Score, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DockPanel>
+                        </Border>
+                        <Border Grid.Column="1" Style="{StaticResource DisplayBorderCenter}">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top" Style="{StaticResource DisplayLabel}" Text="Error"/>
+                                <TextBlock Foreground="{Binding WasRight, Converter={StaticResource CorrectnessToFeedbackColor}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DisplayValue}" Text="{Binding Error, Converter={StaticResource DoubleToPercentageText}, Mode=OneWay, StringFormat='{}{0}%', UpdateSourceTrigger=PropertyChanged}"/>
+                            </DockPanel>
+                        </Border>
+                        <Border Grid.Column="2" Style="{StaticResource DisplayBorderRight}">
+                            <Expander Template="{StaticResource Template1}">
+                                <Expander.Header>
+                                    <TextBlock Style="{StaticResource DisplayLabel}">
+                                        Show Formula
+                                    </TextBlock>
+                                </Expander.Header>
+                                <TextBlock Style="{StaticResource DisplayValue}" Text="{Binding Formula, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Expander>
+                        </Border>
+                    </Grid>
+                </DockPanel>
+            </Grid>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsGame, Converter={StaticResource IsGameToElementVisibility}, ConverterParameter=Options, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="1" Name="Options">
+                        <DockPanel Style="{StaticResource OptionGroup}">
+                            <TextBlock DockPanel.Dock="Top" Style="{StaticResource OptionGroupHeader}" Text="General"/>
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Left"  Style="{StaticResource PrecisionLabel}" Text="Precision:"/>
+                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource PrecisionLabel}" Text="{Binding ElementName=PrecisionSlider, Path=Value, StringFormat='{}{0}%'}"/>
+                                <Slider IsSnapToTickEnabled="True" Maximum="100" Name="PrecisionSlider" Style="{StaticResource PrecisionSlider}" TickFrequency="1" Value="{Binding Precision, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DockPanel>
+                        </DockPanel>
+                        <DockPanel Style="{StaticResource OptionGroup}">
+                            <TextBlock DockPanel.Dock="Top" Style="{StaticResource OptionGroupHeader}" Text="Distance"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Style="{StaticResource OptionUnitHeaderLeft}"  Text="Customary/Imperial"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Style="{StaticResource OptionUnitHeaderRight}" Text="Metric"/>
+                                <Grid      Grid.Column="0" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Inches"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsInchOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="0" Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Feet"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsFootOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="0" Grid.Row="3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Yards"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsYardOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="0" Grid.Row="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Miles"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsMileToKilometerOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="MilliMeters"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsMillimeterOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="Centimeters"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsCentimeterOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="Meters"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsMeterOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="Kilometers"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsMileToKilometerOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                            </Grid>
+                        </DockPanel>
+                        <DockPanel Style="{StaticResource OptionGroup}">
+                            <TextBlock DockPanel.Dock="Top" Style="{StaticResource OptionGroupHeader}" Text="Temperature"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Style="{StaticResource OptionUnitHeaderLeft}"  Text="Customary/Imperial"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Style="{StaticResource OptionUnitHeaderRight}" Text="Metric"/>
+                                <Grid      Grid.Column="0" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Fahrenheit"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsTemperatureOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="Celsius"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsTemperatureOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                            </Grid>
+                        </DockPanel>
+                        <DockPanel Style="{StaticResource OptionGroup}">
+                            <TextBlock DockPanel.Dock="Top" Style="{StaticResource OptionGroupHeader}" Text="Mass"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Style="{StaticResource OptionUnitHeaderLeft}"  Text="Customary/Imperial"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Style="{StaticResource OptionUnitHeaderRight}" Text="Metric"/>
+                                <Grid      Grid.Column="0" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Ounces"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsOunceToGramOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="0" Grid.Row="3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Pounds"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsPoundToKilogramOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="Grams"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsOunceToGramOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="Kilograms"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsPoundToKilogramOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                            </Grid>
+                        </DockPanel>
+                        <DockPanel Style="{StaticResource OptionGroup}">
+                            <TextBlock DockPanel.Dock="Top" Style="{StaticResource OptionGroupHeader}" Text="Liquid Volume"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Style="{StaticResource OptionUnitHeaderLeft}"  Text="Customary/Imperial"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Style="{StaticResource OptionUnitHeaderRight}" Text="Metric"/>
+                                <Grid      Grid.Column="0" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Fluid Ounces"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsFluidOunceOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="0" Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Pints"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsPintOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="0" Grid.Row="3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Quarts"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsQuartOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="0" Grid.Row="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Gallons"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsGallonOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="Milliliters"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsMilliliterOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="Liters"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsLiterOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                            </Grid>
+                        </DockPanel>
+                        <DockPanel Style="{StaticResource OptionGroup}" Margin="0 16">
+                            <TextBlock DockPanel.Dock="Top" Style="{StaticResource OptionGroupHeader}" Text="Speed"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Style="{StaticResource OptionUnitHeaderLeft}"  Text="Customary/Imperial"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Style="{StaticResource OptionUnitHeaderRight}" Text="Metric"/>
+                                <Grid      Grid.Column="0" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelLeft}" Text="Miles/Hour"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsSpeedOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxLeft}"/>
+                                </Grid>
+                                <Grid      Grid.Column="1" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Style="{StaticResource OptionUnitLabelRight}" Text="Kilometers/Hour"/>
+                                    <CheckBox  Grid.Column="1" IsChecked="{Binding IsSpeedOn, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource OptionUnitCheckboxRight}"/>
+                                </Grid>
+                            </Grid>
+                        </DockPanel>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</Window>
